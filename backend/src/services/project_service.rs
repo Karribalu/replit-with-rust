@@ -2,9 +2,6 @@ use std::env;
 use actix_web::{web, HttpResponse, ResponseError};
 use aws_sdk_s3::{Client, Error as SdkError};
 use aws_sdk_s3::config::{Builder, Credentials, Region};
-use aws_sdk_s3::operation::copy_object::{CopyObject, CopyObjectInput};
-use aws_sdk_s3::operation::copy_object::builders::CopyObjectFluentBuilder;
-use aws_sdk_s3::types::Object;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize,Deserialize)]

@@ -1,5 +1,4 @@
 use actix_web::{App, HttpServer, web};
-use aws_sdk_s3::Error;
 
 mod services;
 
