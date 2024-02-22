@@ -1,0 +1,3 @@
+type FileTreeProps{
+    rootDir
+}
