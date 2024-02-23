@@ -22,7 +22,10 @@ impl std::fmt::Display for MyError {
 impl ResponseError for MyError {} // <-- key
 pub async fn create_project(req_data: web::Json<ReqData>) -> Result<HttpResponse, MyError> {
     copy_s3_folder(&req_data.language,&req_data.repl_id).await;
-    Ok(HttpResponse::from(HttpResponse::Ok().content_type("application/json").body(serde_json::to_string(&req_data).unwrap())))
+    Ok(HttpResponse::from(HttpResponse::Ok()
+        .content_type("application/json")
+        .body("Project Created")
+    ))
 }
 
 async fn get_aws_client(aws_access_key: &String, aws_secret: &String, region: &String, cloud_flare_endpoint: &String ) -> Result<Client, SdkError>{
@@ -51,11 +54,11 @@ async fn list_keys(client: &Client, bucket_name: String) -> Result<Vec<String>, 
 }
 
 pub async fn copy_s3_folder(source_prefix: &String, destination_prefix: &String){
-    let aws_access_key: String = env::var("CLOUDFLARE_ACCESS_KEY").expect("aws_access_key must be set");
+    let aws_access_key: String = env::var("CLOUDFLARE_ACCESS_KEY").expect("CLOUDFLARE_ACCESS_KEY must be set");
     let aws_secret = env::var("CLOUDFLARE_ACCESS_SECRET").expect("AWS_SECRET must be set");
     let cloud_flare_endpoint = env::var("CLOUDFLARE_ENDPOINT").expect("CLOUDFLARE_ENDPOINT must be set");
-    let bucket_name: String = "replit-base".to_string();
-    let code_bucket_name = "replit-code".to_string();
+    let bucket_name: String = env::var("S3_BASE_BUCKET").expect("S3_BASE_BUCKET must be set");
+    let code_bucket_name = env::var("S3_CODE_BUCKET").expect("S3_CODE_BUCKET must be set");
     let region: String = String::from("auto");
     let client = get_aws_client(&aws_access_key, &aws_secret, &region, &cloud_flare_endpoint).await.unwrap();
 
