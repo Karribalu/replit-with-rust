@@ -10,7 +10,7 @@ use crate::fs::fetch_dir;
 pub async fn on_connect(socket: SocketRef){
     info!("Socket connected {}", socket.id);
     let host = socket.req_parts().headers.get("host");
-    let host_name = String::from("RandomString.bala.com");
+    let host_name = String::from("DeeppinkFrigidAudacity.bala.com");
     if let Some(host) = host{
         let host_name = host.to_str().unwrap();
     }
