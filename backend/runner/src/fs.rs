@@ -45,6 +45,7 @@ pub fn fetch_dir(dir: PathBuf, base_dir: &String) -> Vec<FileResponse>{
 
 pub fn fetch_file_content(file: String) -> String{
     String::from_utf8(std::fs::read(file).unwrap()).unwrap()
+
 }
 
 pub fn save_file(file: String, content: String){
