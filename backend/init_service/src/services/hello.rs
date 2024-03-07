@@ -1,6 +1,8 @@
-use actix_web::HttpResponse;
+use axum::http::StatusCode;
+use axum::Json;
+use axum::response::IntoResponse;
+use serde_json::json;
 
-pub async fn search(_: String) -> Result<HttpResponse, actix_web::Error> {
-
-    Ok(HttpResponse::from(HttpResponse::Ok().content_type("text/plain").body("hello")))
+pub async fn search() -> impl IntoResponse{
+    (StatusCode::CREATED, Json(json!({"hello": "world"})))
 }

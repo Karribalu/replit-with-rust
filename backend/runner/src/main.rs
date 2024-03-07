@@ -20,7 +20,7 @@ async fn main(){
             .layer(CorsLayer::permissive())
             .layer(layer));
 
-    let listener = tokio::net::TcpListener::bind("localhost:3000").await.unwrap();
+    let listener = tokio::net::TcpListener::bind("localhost:3002").await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
 

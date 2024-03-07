@@ -23,15 +23,17 @@ export const FileTree = (props: FileTreeProps) => {
 const SubTree = (props: SubTreeProps) => {
   return (
     <div>
-      {props.directory.dirs.sort(sortDir).map((dir) => (
-        <React.Fragment key={dir.id}>
-          <DirDiv
-            directory={dir}
-            selectedFile={props.selectedFile}
-            onSelect={props.onSelect}
-          />
-        </React.Fragment>
-      ))}
+      {props.directory.dirs.sort(sortDir).map((dir) => {
+        return (
+          <React.Fragment key={dir.id}>
+            <DirDiv
+              directory={dir}
+              selectedFile={props.selectedFile}
+              onSelect={props.onSelect}
+            />
+          </React.Fragment>
+        );
+      })}
       {props.directory.files.sort(sortFile).map((file) => (
         <React.Fragment key={file.id}>
           <FileDiv
@@ -95,7 +97,28 @@ const DirDiv = ({
     defaultOpen = isChildSelected(directory, selectedFile);
   }
   const [open, setOpen] = useState(defaultOpen);
-  return <></>;
+  return (
+    <>
+      <FileDiv
+        file={directory}
+        icon={open ? "openDirectory" : "closedDirectory"}
+        selectedFile={selectedFile}
+        onClick={() => {
+          if (!open) {
+            onSelect(directory);
+          }
+          setOpen(!open);
+        }}
+      />
+      {open ? (
+        <SubTree
+          directory={directory}
+          selectedFile={selectedFile}
+          onSelect={onSelect}
+        />
+      ) : null}
+    </>
+  );
 };
 
 const isChildSelected = (dir: Directory, selectedFile: File) => {

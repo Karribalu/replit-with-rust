@@ -37,6 +37,7 @@ export function buildFileTree(data: RemoteFile[]): Directory {
     dirs: [],
     files: [],
   };
+
   dirs.forEach((item) => {
     let dir: Directory = {
       id: item.path,
@@ -73,6 +74,7 @@ export function buildFileTree(data: RemoteFile[]): Directory {
     };
     cache.set(file.id, file);
   });
+
   cache.forEach((value, key) => {
     if (value.parentId === "0") {
       if (value.type === Type.DIRECTORY) rootDir.dirs.push(value as Directory);

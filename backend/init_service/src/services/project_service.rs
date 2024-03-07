@@ -1,10 +1,17 @@
 use std::env;
-use actix_web::{web, HttpResponse, ResponseError};
 use aws_sdk_s3::{Client, Error as SdkError};
 use aws_sdk_s3::config::{Builder, Credentials, Region};
+use axum::body::Body;
+use axum::extract::Query;
+use axum::http::{HeaderMap, HeaderValue, StatusCode};
+use axum::Json;
+use axum::response::{IntoResponse, Response};
 use serde::{Deserialize, Serialize};
+use serde_json::json;
+use log::info;
 
 #[derive(Serialize,Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ReqData{
     repl_id: String,
     language: String
@@ -19,13 +26,12 @@ impl std::fmt::Display for MyError {
         write!(f, "A validation error occurred on the input.")
     }
 }
-impl ResponseError for MyError {} // <-- key
-pub async fn create_project(req_data: web::Json<ReqData>) -> Result<HttpResponse, MyError> {
+pub async fn create_project( Json(req_data):  Json<ReqData>) -> impl IntoResponse {
+    info!("I received request {:?}", json!(req_data));
     copy_s3_folder(&req_data.language,&req_data.repl_id).await;
-    Ok(HttpResponse::from(HttpResponse::Ok()
-        .content_type("application/json")
-        .body("Project Created")
-    ))
+    let mut headers = HeaderMap::new();
+    headers.insert("Access-Control-Allow-Origin", "*".parse().unwrap());
+    (headers, Json(json!({"response": "created"})))
 }
 
 async fn get_aws_client(aws_access_key: &String, aws_secret: &String, region: &String, cloud_flare_endpoint: &String ) -> Result<Client, SdkError>{
@@ -76,7 +82,7 @@ pub async fn copy_s3_folder(source_prefix: &String, destination_prefix: &String)
             .key(&destination_key)
             .bucket(&code_bucket_name)
             .send()
-            .await
+            .await;
     }
 
 }

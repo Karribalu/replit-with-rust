@@ -41,7 +41,8 @@ const useSocket = (replId: string) => {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const newSocket = io(`ws://${replId}.peetcode.com`);
+    // const newSocket = io(`ws://${replId}.peetcode.com`);
+    const newSocket = io(`ws://localhost:3002`);
     setSocket(newSocket);
 
     return () => {
@@ -82,32 +83,46 @@ export const CodingPage = () => {
   const [fileStructure, setFileStructure] = useState<RemoteFile[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
   const [showOutput, setShowOutput] = useState(false);
-
+  const [contentResolved, setContentResolved] = useState<string | null>(null);
+  useEffect(() => {
+    if (contentResolved && selectedFile) {
+      let file = selectedFile;
+      file.content = contentResolved;
+      setSelectedFile(file);
+    }
+  }, [contentResolved, selectedFile]);
   useEffect(() => {
     if (socket) {
       socket.on("loaded", ({ rootContent }: { rootContent: RemoteFile[] }) => {
         setLoaded(true);
+
         setFileStructure(rootContent);
+      });
+      socket.on(
+        "fetchDirResolved",
+        ({ dirContent }: { dirContent: RemoteFile[] }) => {
+          setFileStructure((prev) => {
+            const allFiles = [...prev, ...dirContent];
+            return allFiles.filter(
+              (file, index, self) =>
+                index === self.findIndex((f) => f.path === file.path)
+            );
+          });
+        }
+      );
+      socket.on("fetchContentResolved", ({ content }: { content: string }) => {
+        console.log("content", content);
+
+        setContentResolved(content);
       });
     }
   }, [socket]);
 
   const onSelect = (file: File) => {
     if (file.type === Type.DIRECTORY) {
-      socket?.emit("fetchDir", file.path, (data: RemoteFile[]) => {
-        setFileStructure((prev) => {
-          const allFiles = [...prev, ...data];
-          return allFiles.filter(
-            (file, index, self) =>
-              index === self.findIndex((f) => f.path === file.path)
-          );
-        });
-      });
+      socket?.emit("fetchDir", file.path);
     } else {
-      socket?.emit("fetchContent", { path: file.path }, (data: string) => {
-        file.content = data;
-        setSelectedFile(file);
-      });
+      socket?.emit("fetchContent", { path: file.path });
     }
   };
 

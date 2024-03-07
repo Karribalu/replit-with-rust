@@ -90,12 +90,22 @@ export const Landing = () => {
       >
         <option value="node-js">Node.js</option>
         <option value="python">Python</option>
+        <option value="react">React</option>
       </StyledSelect>
       <StyledButton
         disabled={loading}
         onClick={async () => {
           setLoading(true);
-          await axios.post(`${SERVICE_URL}/project`, { replId, language });
+          await axios.post(
+            "/project",
+            { replId, language },
+            {
+              proxy: {
+                host: "localhost",
+                port: 3001,
+              },
+            }
+          );
           setLoading(false);
           navigate(`/coding/?replId=${replId}`);
         }}
