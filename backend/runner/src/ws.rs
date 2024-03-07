@@ -41,7 +41,7 @@ pub async fn on_connect(socket: SocketRef){
 fn init_handlers(socket: SocketRef, repl_id: String){
     let cloned_repl_id = repl_id.clone();
     let current_dir = PathBuf::from(&format!("/Users/balasubramanyam/{}", &repl_id.to_owned()));
-    socket.on("fetchDir", |socket: SocketRef, Data::<String>(dir)| {
+    socket.on("fetchDir", |socket: SocketRef, Data::<String>(dir)| async move{
         info!("Directory is being fetched {}", dir);
 
         let full_path = &current_dir.clone().to_owned().join("tmp").join(&dir);
@@ -50,15 +50,15 @@ fn init_handlers(socket: SocketRef, repl_id: String){
             "dirContent": data
         }));
     });
-    socket.on("fetchContent", |socket: SocketRef, Data::<String>(file)| async move{
-        info!("File content is being fetched {}", file);
-        // let current_dir = PathBuf::from(&format!("/Users/balasubramanyam/{}", &repl_id.to_owned()));
-        let full_path = &current_dir.join("tmp").join(&file);
-        let content = fetch_file_content(full_path);
-        let _ = socket.emit("fetchContentResolved", json!({
-            "content": content
-        }));
-    });
+    // socket.on("fetchContent", |socket: SocketRef, Data::<String>(file)| async move{
+    //     info!("File content is being fetched {}", file);
+    //     // let current_dir = PathBuf::from(&format!("/Users/balasubramanyam/{}", &repl_id.to_owned()));
+    //     let full_path = &current_dir.join("tmp").join(&file);
+    //     let content = fetch_file_content(full_path);
+    //     let _ = socket.emit("fetchContentResolved", json!({
+    //         "content": content
+    //     }));
+    // });
     socket.on("join", |socket: SocketRef, Data::<String>(room_id) | async move {
         warn!("Joining room {}", room_id);
         let _ = socket.leave_all();
