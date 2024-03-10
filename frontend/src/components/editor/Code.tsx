@@ -10,8 +10,6 @@ export const Code = ({
   socket: Socket | null;
 }) => {
   if (!selectedFile) return null;
-
-  const code = selectedFile.content;
   let language = selectedFile.name.split(".").pop();
 
   if (language === "js" || language === "jsx") language = "javascript";
@@ -32,7 +30,7 @@ export const Code = ({
     <Editor
       height="100vh"
       language={language}
-      value={code}
+      value={selectedFile.content ?? ""}
       theme="vs-dark"
       onChange={() =>
         debounce((value) => {

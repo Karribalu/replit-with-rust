@@ -82,6 +82,9 @@ export const CodingPage = () => {
   const socket = useSocket(replId);
   const [fileStructure, setFileStructure] = useState<RemoteFile[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
+  const [tempSelectedFile, setTempSelectedFile] = useState<File | undefined>(
+    undefined
+  );
   const [showOutput, setShowOutput] = useState(false);
   const [contentResolved, setContentResolved] = useState<string | null>(null);
   useEffect(() => {
@@ -89,6 +92,8 @@ export const CodingPage = () => {
       let file = selectedFile;
       file.content = contentResolved;
       setSelectedFile(file);
+      setTempSelectedFile(undefined);
+      setContentResolved(null);
     }
   }, [contentResolved, selectedFile]);
   useEffect(() => {
@@ -111,8 +116,6 @@ export const CodingPage = () => {
         }
       );
       socket.on("fetchContentResolved", ({ content }: { content: string }) => {
-        console.log("content", content);
-
         setContentResolved(content);
       });
     }
@@ -122,7 +125,8 @@ export const CodingPage = () => {
     if (file.type === Type.DIRECTORY) {
       socket?.emit("fetchDir", file.path);
     } else {
-      socket?.emit("fetchContent", { path: file.path });
+      setSelectedFile(file);
+      socket?.emit("fetchContent", file.path);
     }
   };
 
@@ -145,7 +149,7 @@ export const CodingPage = () => {
           />
         </LeftPanel>
         <RightPanel>
-          {showOutput && <Output />}
+          {/* {showOutput && <Output />} */}
           <Terminal socket={socket} />
         </RightPanel>
       </Workspace>
